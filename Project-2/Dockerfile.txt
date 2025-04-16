@@ -1,0 +1,14 @@
+# FROM node:14
+# You can switch to node:16 if needed
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]

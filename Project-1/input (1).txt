@@ -1,0 +1,3 @@
+Aws bucket created, An AWS account with access to EC2/LightSail.
+An S3 bucket containing your text file.
+SSH access to the instance.
