@@ -1,4 +1,3 @@
-
 from pyspark.sql import SparkSession
 
 # AWS Credentials
@@ -11,12 +10,15 @@ S3_OUTPUT = 's3a://mounikawordcount/output_folder/'
 
 # Spark Session
 spark = SparkSession.builder \
-    .appName("WordCount") \
-    .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.1,com.amazonaws:aws-java-sdk-bundle:1.11.901") \
-    .getOrCreate()
+        .appName("WordCount") \
+        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.1,com.amazonaws:aws-java-sdk-bundle:1.11.901") \
+        .getOrCreate()
 
 # Hadoop S3 Configuration using default AWS credentials
 hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
+hadoop_conf.set("fs.s3a.access.key", AWS_ACCESS_KEY_ID)
+hadoop_conf.set("fs.s3a.secret.key", AWS_SECRET_ACCESS_KEY)
+hadoop_conf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
 hadoop_conf.set("fs.s3a.credentials.provider", "com.amazonaws.auth.DefaultAWSCredentialsProviderChain")
 
 # Word Count Logic
@@ -25,6 +27,5 @@ counts = text_file.flatMap(lambda line: line.split()) \
                   .map(lambda word: (word, 1)) \
                   .reduceByKey(lambda a, b: a + b)
 counts.saveAsTextFile(S3_OUTPUT)
-
 spark.stop()
 
